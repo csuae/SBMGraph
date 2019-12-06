@@ -41,10 +41,10 @@ class SBMEvaluator(object):
         self.cmt_dict = dict(node_cmt_list)
 
     def measure(self):
-        edge_max_num = self._node_num * (self._node_num-1) / 2
+        edge_max_num = self._node_num * (self._node_num-1) # undirected graph
         self.inblock_max_num = 0
         for _, size in enumerate(self._community_size):
-            self.inblock_max_num += size * (size-1) / 2
+            self.inblock_max_num += size * (size-1)
         
         self.crossblock_max_num = edge_max_num - self.inblock_max_num
         
