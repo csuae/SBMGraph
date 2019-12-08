@@ -24,21 +24,23 @@ class SBMGraph(object):
         *nodes_to_purturb: # of nodes to change their cmt.
     '''
 
-    def __init__(self, node_num, community_num, community_id=1, nodes_to_purturb=5, inblock_prob=0.2, crossblock_prob=0.01, community_size=None):
+    def __init__(self, node_num, community_num, community_id=1, nodes_to_purturb=5, inblock_prob=0.1, crossblock_prob=0.01, community_size=None):
         self._node_num = node_num
         self._community_num = community_num
         self._community_id = community_id
         self._nodes_to_purturb=nodes_to_purturb
         self._graph = None
         self._chngnodes = None
+        self._inblock_prob = inblock_prob
+        self._crossblock_prob = crossblock_prob
         self.set_mtx_B(inblock_prob, crossblock_prob)
-        self.sample_node_community(community_size)
+        self.sample_node_community(community_size) # specify cmt_size if not, appoint cmt_id to each node
 
     def set_mtx_B(self, inblock_prob=0.1, crossblock_prob=0.01):
         self._B = np.ones((self._community_num, self._community_num)) * crossblock_prob
         for i in range(self._community_num):
             self._B[i, i] = inblock_prob
-        
+
         return self._B
 
     def sample_graph(self):
@@ -51,19 +53,23 @@ class SBMGraph(object):
                 prob = self._B[self._node_community[i], self._node_community[j]]
                 if np.random.uniform() <= prob:
                     self._graph.add_edge(i, j)
-                    self._graph.add_edge(j, i) # undirected graph
-        
+                    self._graph.add_edge(j, i) # directed graph
+
+        nodes= [i for i in range(self._node_num) if self._node_community[i]==self._community_id]
+        self._chngnodes = random.sample(nodes, self._nodes_to_purturb)
+
         return self._graph
+
 
     def sample_node_community(self, community_size=None):
         if community_size is None:
             community_size = np.random.multinomial(self._node_num, [1.0 / self._community_num] * self._community_num)
-        print("community_size", community_size)    
+        print("community_size", community_size)
 
         self._node_community = []
         assert(len(community_size) == self._community_num) # test if the input is legal
         for i, size in enumerate(community_size):
-            self._node_community += [i] * size
+            self._node_community += [i] * size # list of cmt_id by increasing order
 
     def save_as_csv(self):
         # file 1

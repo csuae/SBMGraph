@@ -41,7 +41,7 @@ class SBMEvaluator(object):
         self.cmt_dict = dict(node_cmt_list)
 
     def measure(self):
-        edge_max_num = self._node_num * (self._node_num-1) # undirected graph
+        edge_max_num = self._node_num * (self._node_num-1) # directed graph
         self.inblock_max_num = 0
         for _, size in enumerate(self._community_size):
             self.inblock_max_num += size * (size-1)
@@ -74,6 +74,12 @@ class SBMEvaluator(object):
         print('The Generated crossblock freq. is %.4f' % self.crossblock_freq)
 
 if __name__ == '__main__':
-    my_Evaluator = SBMEvaluator(community_size=[500, 500], inblock_prob=0.2,
-                     crossblock_prob=0.05, adj_file='./sbm_1000n_adj.csv', cmt_file='./sbm_1000n_cmt.csv')
-    my_Evaluator.report()
+    length = 5
+    for i in range(length):
+        adj_file = './sbm_1000n_adj_t' + str(i) + '.csv'
+        cmt_file = './sbm_1000n_cmt_t' + str(i) + '.csv'
+        my_Evaluator = SBMEvaluator(community_size=[500, 500], inblock_prob=0.1,
+                        crossblock_prob=0.01, adj_file=adj_file, cmt_file=cmt_file)
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('Timestamp %d: ' % i)
+        my_Evaluator.report()
